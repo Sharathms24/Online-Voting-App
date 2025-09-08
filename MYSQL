@@ -1,0 +1,23 @@
+-- Polls table
+CREATE TABLE polls (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    question TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Options table
+CREATE TABLE poll_options (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    poll_id INT FOREIGN KEY REFERENCES polls(id),
+    option_text VARCHAR(255) NOT NULL,
+    votes INT DEFAULT 0
+);
+
+-- User votes tracking
+CREATE TABLE user_votes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_ip VARCHAR(45) NOT NULL,
+    poll_id INT FOREIGN KEY REFERENCES polls(id),
+    option_id INT FOREIGN KEY REFERENCES poll_options(id),
+    voted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
