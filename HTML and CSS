@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Voting App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 10px 10px 0 0;
+            margin-right: 5px;
+        }
+
+        .nav-tab:last-child {
+            margin-right: 0;
+        }
+
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .option-input {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .option-input input {
+            margin-right: 10px;
+        }
+
+        .remove-option {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .remove-option:hover {
+            background: #c82333;
+        }
+
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .add-option-btn {
+            background: #28a745;
+            margin-bottom: 20px;
+        }
+
+        .add-option-btn:hover {
+            background: #218838;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .poll-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .poll-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .poll-question {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .poll-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .poll-option:hover {
+            background: #e3f2fd;
+        }
+
+        .poll-option input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .vote-btn {
+            background: #28a745;
+            margin-top: 15px;
+        }
+
+        .vote-btn:hover {
+            background: #218838;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .results-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 30px;
+            margin: 10px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .results-fill {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .nav-tab {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗳 Online Voting System</h1>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('create-poll')">Create Poll</button>
+            <button class="nav-tab" onclick="showTab('vote')">Vote</button>
+            <button class="nav-tab" onclick="showTab('results')">Results</button>
+        </div>
+
+        <!-- Create Poll Tab -->
+        <div id="create-poll" class="tab-content active">
+            <form id="pollForm">
+                <div class="form-group">
+                    <label for="pollQuestion">Poll Question:</label>
+                    <textarea id="pollQuestion" placeholder="Enter your poll question..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Options:</label>
+                    <div id="optionsContainer">
+                        <div class="option-input">
+                            <input type="text" placeholder="Option 1" required>
+                        </div>
+                        <div class="option-input">
+                            <input type="text" placeholder="Option 2" required>
+                        </div>
+                    </div>
+                    <button type="button" class="add-option-btn" onclick="addOption()">+ Add Option</button>
+                </div>
+
+                <button type="submit">Create Poll</button>
+            </form>
+        </div>
+
+        <!-- Vote Tab -->
+        <div id="vote" class="tab-content">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalPolls">0</div>
+                    <div class="stat-label">Active Polls</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalVotes">0</div>
+                    <div class="stat-label">Total Votes</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="userVotes">0</div>
+                    <div class="stat-label">Your Votes</div>
+                </div>
+            </div>
+            <div id="pollsContainer"></div>
+        </div>
+
+        <!-- Results Tab -->
+        <div id="results" class="tab-content">
+            <div id="resultsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate database storage using localStorage
+        class VotingSystem {
+            constructor() {
+                this.polls = JSON.parse(localStorage.getItem('polls')) || [];
+                this.userVotes = JSON.parse(localStorage.getItem('userVotes')) || {};
+                this.userIP = this.generateUserID(); // Simulate IP tracking
+                this.init();
+            }
+
+            generateUserID() {
+                let userID = localStorage.getItem('userID');
+                if (!userID) {
+                    userID = 'user_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('userID', userID);
+                }
+                return userID;
+            }
+
+            init() {
+                this.displayPolls();
+                this.displayResults();
+                this.updateStats();
+            }
+
+            createPoll(question, options) {
+                const poll = {
+                    id: Date.now(),
+                    question: question,
+                    options: options.map(option => ({
+                        text: option,
+                        votes: 0
+                    })),
+                    totalVotes: 0,
+                    createdAt: new Date().toLocaleString()
+                };
+
+                this.polls.push(poll);
+                this.savePolls();
+                this.displayPolls();
+                this.displayResults();
+                this.updateStats();
+                
+                return poll;
+            }
+
+            vote(pollId, optionIndex) {
+                const userVoteKey = ${this.userIP}_${pollId};
+                
+                if (this.userVotes[userVoteKey]) {
+                    return { success: false, message: 'You have already voted in this poll!' };
+                }
+
+                const poll = this.polls.find(p => p.id === pollId);
+                if (!poll) {
+                    return { success: false, message: 'Poll not found!' };
+                }
+
+                poll.options[optionIndex].votes++;
+                poll.totalVotes++;
+                this.userVotes[userVoteKey] = optionIndex;
+
+                this.savePolls();
+                this.saveUserVotes();
+                this.displayPolls();
+                this.displayResults();
+                this.updateStats();
+
+                return { success: true, message: 'Vote recorded successfully!' };
+            }
+
+            hasUserVoted(pollId) {
+                const userVoteKey = ${this.userIP}_${pollId};
+                return this.userVotes[userVoteKey] !== undefined;
+            }
+
+            getUserVote(pollId) {
+                const userVoteKey = ${this.userIP}_${pollId};
+                return this.userVotes[userVoteKey];
+            }
+
+            savePolls() {
+                localStorage.setItem('polls', JSON.stringify(this.polls));
+            }
+
+            saveUserVotes() {
+                localStorage.setItem('userVotes', JSON.stringify(this.userVotes));
+            }
+
+            displayPolls() {
+                const container = document.getElementById('pollsContainer');
+                container.innerHTML = '';
+
+                if (this.polls.length === 0) {
+                    container.innerHTML = '<div class="message info">No polls available. Create a poll to get started!</div>';
+                    return;
+                }
+
+                this.polls.forEach(poll => {
+                    const hasVoted = this.hasUserVoted(poll.id);
+                    const userVote = this.getUserVote(poll.id);
+                    
+                    const pollCard = document.createElement('div');
+                    pollCard.className = 'poll-card';
+                    
+                    let optionsHTML = '';
+                    poll.options.forEach((option, index) => {
+                        const isSelected = hasVoted && userVote === index;
+                        const selectedClass = isSelected ? 'style="background: #e3f2fd; border: 2px solid #667eea;"' : '';
+                        
+                        optionsHTML += `
+                            <div class="poll-option" ${selectedClass}>
+                                <input type="radio" name="poll_${poll.id}" value="${index}" ${hasVoted ? 'disabled' : ''} ${isSelected ? 'checked' : ''}>
+                                <span>${option.text}</span>
+                            </div>
+                        `;
+                    });
+
+                    pollCard.innerHTML = `
+                        <div class="poll-question">${poll.question}</div>
+                        <div class="poll-options">
+                            ${optionsHTML}
+                        </div>
+                        <button class="vote-btn" onclick="votingSystem.submitVote(${poll.id})" ${hasVoted ? 'disabled style="opacity: 0.6; cursor: not-allowed;"' : ''}>
+                            ${hasVoted ? 'Already Voted' : 'Submit Vote'}
+                        </button>
+                        <div style="margin-top: 10px; font-size: 14px; color: #666;">
+                            Created: ${poll.createdAt} | Total Votes: ${poll.totalVotes}
+                        </div>
+                    `;
+
+                    container.appendChild(pollCard);
+                });
+            }
+
+            displayResults() {
+                const container = document.getElementById('resultsContainer');
+                container.innerHTML = '';
+
+                if (this.polls.length === 0) {
+                    container.innerHTML = '<div class="message info">No polls available to show results.</div>';
+                    return;
+                }
+
+                this.polls.forEach(poll => {
+                    const pollCard = document.createElement('div');
+                    pollCard.className = 'poll-card';
+                    
+                    let resultsHTML = '';
+                    poll.options.forEach((option, index) => {
+                        const percentage = poll.totalVotes > 0 ? Math.round((option.votes / poll.totalVotes) * 100) : 0;
+                        
+                        resultsHTML += `
+                            <div style="margin-bottom: 15px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span>${option.text}</span>
+                                    <span>${option.votes} votes (${percentage}%)</span>
+                                </div>
+                                <div class="results-bar">
+                                    <div class="results-fill" style="width: ${percentage}%;">
+                                        ${percentage > 15 ? percentage + '%' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    pollCard.innerHTML = `
+                        <div class="poll-question">${poll.question}</div>
+                        <div style="margin-bottom: 20px;">
+                            ${resultsHTML}
+                        </div>
+                        <div style="font-size: 14px; color: #666;">
+                            Created: ${poll.createdAt} | Total Votes: ${poll.totalVotes}
+                        </div>
+                    `;
+
+                    container.appendChild(pollCard);
+                });
+            }
+
+            submitVote(pollId) {
+                const selectedOption = document.querySelector(input[name="poll_${pollId}"]:checked);
+                
+                if (!selectedOption) {
+                    this.showMessage('Please select an option before voting!', 'error');
+                    return;
+                }
+
+                const result = this.vote(pollId, parseInt(selectedOption.value));
+                this.showMessage(result.message, result.success ? 'success' : 'error');
+            }
+
+            updateStats() {
+                document.getElementById('totalPolls').textContent = this.polls.length;
+                document.getElementById('totalVotes').textContent = this.polls.reduce((sum, poll) => sum + poll.totalVotes, 0);
+                document.getElementById('userVotes').textContent = Object.keys(this.userVotes).length;
+            }
+
+            showMessage(message, type) {
+                const existingMessage = document.querySelector('.message');
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+
+                const messageDiv = document.createElement('div');
+                messageDiv.className = message ${type};
+                messageDiv.textContent = message;
+
+                const container = document.querySelector('.tab-content.active');
+                container.insertBefore(messageDiv, container.firstChild);
+
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.remove();
+                    }
+                }, 3000);
+            }
+        }
+
+        // Initialize the voting system
+        const votingSystem = new VotingSystem();
+
+        // Tab navigation
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
